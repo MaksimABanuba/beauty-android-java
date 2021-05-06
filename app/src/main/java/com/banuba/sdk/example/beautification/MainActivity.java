@@ -4,10 +4,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
@@ -18,10 +14,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.banuba.sdk.effect_player.Effect;
 import com.banuba.sdk.example.beautification.effects.EffectController;
+import com.banuba.sdk.example.beautification.effects.beauty.MakeupModelDataListener;
 import com.banuba.sdk.example.beautification.effects.beauty.ModelDataListener;
 import com.banuba.sdk.example.beautification.effects.color.ColorValueListener;
-import com.banuba.sdk.effect_player.Effect;
 import com.banuba.sdk.manager.BanubaSdkManager;
 
 import org.json.JSONArray;
@@ -41,11 +43,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final Map<String, String> mEffects = new HashMap<String, String>() {
         {
-            put("Beauty", "Beauty_base");
-            put("Eyes", "test_Eyes");
-            put("Hair", "test_Hair");
-            put("Lips", "test_Lips");
-            put("Skin", "test_Skin");
+            put("Beauty", "Makeup");
         }
     };
 
@@ -83,7 +81,25 @@ public class MainActivity extends AppCompatActivity
         final RecyclerView effectItemView = findViewById(R.id.effect_selector_view);
         final ViewGroup effectValuesView = findViewById(R.id.effect_parameters_view);
         mEffectController =
-            new EffectController(effectItemView, effectValuesView, presets_selector, this, this);
+            new EffectController(
+                effectItemView,
+                effectValuesView,
+                presets_selector,
+                this,
+                this,
+                new MakeupModelDataListener() {
+                    @Override
+                    public void onModelDataChanged(Map<String, String> values) {
+                        for (Map.Entry<String, String> item : values.entrySet()) {
+                            mCurrentEffect.callJsMethod(item.getKey(), item.getValue());
+                        }
+                    }
+
+                    @Override
+                    public void onModelDataChanged(String name, String value) {
+                        mCurrentEffect.callJsMethod(name, value);
+                    }
+                });
     }
 
     private boolean isCameraPermissionGranted() {

@@ -21,6 +21,8 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
+
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
@@ -41,4 +43,6 @@ dependencies {
     implementation fileTree(dir: '../libs', include: ['*.aar'])
     implementation files(":banuba_effect_player-release@aar")
     implementation files(":banuba_sdk-release@aar")
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 }
